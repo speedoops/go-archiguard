@@ -1,0 +1,60 @@
+layers:
+  common:
+    paths:
+      - "**/common/**"
+  generated:
+    paths:
+      - "**/protogen/**"
+  domain:
+    paths:
+      - "**/domain/**"
+      - "**/domain/**/service/**"
+  application:
+    paths:
+      - "**/app/**"
+      - "**/service/**"
+      - "**/app/**/service/**"
+  interfaces:
+    paths:
+      - "**/api/**"
+      - "**/ports/**"
+  infrastructure:
+    paths:
+      - "**/adapters/**"
+
+  # 如果不匹配任何以上规则，且目录中有go.mod文件，则分层为`root`，否则为`unknown`
+
+exclude_dirs:
+  - "**/test"
+  - "**/tools"
+  - "**/examples"
+  - "**/vendor"
+
+dependency_rules:
+  # 层间依赖规则
+  - from: "unknown"
+    to: "unknown"
+    allow: true
+  - from: "domain"
+    to: "domain"
+    allow: true
+  - from: "domain"
+    to: "*"
+    allow: false
+  - from: "application"
+    to: "infrastructure"
+    allow: false
+
+  # 外部依赖规则
+  - from: "application"
+    to: "mycompany.org/xx/moduleA"
+    allow: true
+  - from: "domain"
+    to: "mycompany.org/xx/moduleB"
+    allow: false
+  - from: "infrastructure"
+    to: "cloud.google.com/go/firestore"
+    allow: true
+  - from: "*"
+    to: "cloud.google.com/go/firestore"
+    allow: false
